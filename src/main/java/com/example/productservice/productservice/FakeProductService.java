@@ -4,7 +4,10 @@ import com.example.productservice.dto.FakeProductDTO;
 import com.example.productservice.interfaceservice.ProductService;
 import com.example.productservice.models.Category;
 import com.example.productservice.models.Product;
+import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpMessageConverterExtractor;
+import org.springframework.web.client.RequestCallback;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
@@ -39,6 +42,30 @@ public class FakeProductService implements ProductService {
         }
 
         return products;
+    }
+
+    @Override
+    public Product updateProduct(long id, Product product) {
+        RequestCallback requestCallback = restTemplete.httpEntityCallback(product, FakeProductDTO.class);
+
+        HttpMessageConverterExtractor<FakeProductDTO> responseExtractor = new HttpMessageConverterExtractor(
+                FakeProductDTO.class,
+                restTemplete.getMessageConverters()
+        );
+
+        FakeProductDTO response = restTemplete.execute(
+                "https://fakestoreapi.com/products/" + id,
+                HttpMethod.PATCH,
+                requestCallback,
+                responseExtractor
+        );
+
+        return convertFakeProductToProduct(response);
+    }
+
+    @Override
+    public Product replaceProduct(long id) {
+        return null;
     }
 
     public Product convertFakeProductToProduct(FakeProductDTO fakeProductDTO){
