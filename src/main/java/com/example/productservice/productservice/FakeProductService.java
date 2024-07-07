@@ -1,6 +1,7 @@
 package com.example.productservice.productservice;
 
 import com.example.productservice.dto.FakeProductDTO;
+import com.example.productservice.exceptions.ProductNotFound;
 import com.example.productservice.interfaceservice.ProductService;
 import com.example.productservice.models.Category;
 import com.example.productservice.models.Product;
@@ -21,11 +22,15 @@ public class FakeProductService implements ProductService {
         this.restTemplete = restTemplete;
     }
     @Override
-    public Product getProductById(long id) {
+    public Product getProductById(long id) throws ProductNotFound {
         FakeProductDTO fakeProductDTO = restTemplete.getForObject(
             "https://fakestoreapi.com/products/" + id,
             FakeProductDTO.class
         );
+
+        if (fakeProductDTO == null){
+            throw new ProductNotFound("Product not found fot this id " + id);
+        }
 
         return convertFakeProductToProduct(fakeProductDTO);
     }
@@ -55,7 +60,7 @@ public class FakeProductService implements ProductService {
 
         FakeProductDTO response = restTemplete.execute(
                 "https://fakestoreapi.com/products/" + id,
-                HttpMethod.PATCH,
+                HttpMethod.PUT,
                 requestCallback,
                 responseExtractor
         );

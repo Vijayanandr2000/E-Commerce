@@ -1,7 +1,10 @@
 package com.example.productservice.productcontroller;
 
+import com.example.productservice.exceptions.ProductNotFound;
 import com.example.productservice.interfaceservice.ProductService;
 import com.example.productservice.models.Product;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -17,8 +20,13 @@ public class ProductController {
     }
 
     @GetMapping("/{id}")
-    Product getProductById(@PathVariable("id") Long id){
-       return productService.getProductById(id);
+    ResponseEntity<Product> getProductById(@PathVariable("id") Long id) throws ProductNotFound {
+           ResponseEntity<Product> response = new ResponseEntity<>(
+                   productService.getProductById(id),
+                   HttpStatus.OK
+           );
+
+           return response;
     }
 
     @GetMapping()
@@ -26,15 +34,8 @@ public class ProductController {
         return  productService.getProducts();
     }
 
-    @PatchMapping("/{id}")
+    @PutMapping("/{id}")
     Product updateProduct(@PathVariable("id") Long id, @RequestBody Product product){
         return  productService.updateProduct(id, product);
     }
-
-    @PutMapping("/{id}")
-    Product replaceProduct(@PathVariable("id") Long id){
-        return null;
-    }
-
-
 }
